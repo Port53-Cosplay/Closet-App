@@ -1,0 +1,269 @@
+{% extends "index.html" %}
+
+{% block title %}Outfit Calendar{% endblock %}
+
+{% block content %}
+<div class="lcars-row">
+    <div class="lcars-column lcars-u-3">
+        <div class="lcars-element lcars-primary-bg">
+            <h2>Outfit Calendar</h2>
+        </div>
+        <div class="lcars-element lcars-secondary-bg">
+            <div class="lcars-calendar-controls">
+                <h3>Schedule Outfit</h3>
+                <form id="schedule-form">
+                    <div class="form-group">
+                        <label for="date-input">Date:</label>
+                        <input type="date" id="date-input" class="lcars-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="outfit-select">Outfit:</label>
+                        <select id="outfit-select" class="lcars-select" required>
+                            <option value="">Select an outfit</option>
+                            <!-- Outfits will be loaded dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes-input">Notes:</label>
+                        <textarea id="notes-input" class="lcars-textarea"></textarea>
+                    </div>
+                    <button type="submit" class="lcars-button lcars-accent-bg-1">Schedule</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="lcars-column lcars-u-9">
+        <div class="lcars-element lcars-accent-bg-1">
+            <h3>Today's Outfit</h3>
+        </div>
+        <div class="lcars-element lcars-bg-1">
+            <div id="today-outfit" class="lcars-outfit-display">Loading today's outfit...</div>
+        </div>
+        <div class="lcars-element lcars-accent-bg-2">
+            <h3>Upcoming Outfits</h3>
+        </div>
+        <div class="lcars-element lcars-bg-2">
+            <div id="upcoming-outfits" class="lcars-list">Loading upcoming outfits...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load all outfits for the dropdown
+        fetch('/outfits')
+            .then(response => response.text())
+            .then(html => {
+                // Extract outfits from the HTML response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const outfitElements = doc.querySelectorAll('.outfit-item');
+                
+                const outfitSelect = document.getElementById('outfit-select');
+                
+                outfitElements.forEach(element => {
+                    const outfitId = element.getAttribute('data-outfit-id');
+                    const outfitName = element.querySelector('.outfit-name').textContent;
+                    
+                    const option = document.createElement('option');
+                    option.value = outfitId;
+                    option.textContent = outfitName;
+                    outfitSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading outfits:', error);
+            });
+        
+        // Load today's outfit
+        fetch('/api/features/calendar/today')
+            .then(response => response.json())
+            .then(data => {
+                const todayOutfitDiv = document.getElementById('today-outfit');
+                
+                if (data.success && data.outfit) {
+                    const outfit = data.outfit;
+                    let html = `
+                        <h4>${outfit.outfit.name}</h4>
+                        <p class="outfit-date">Date: ${outfit.date}</p>
+                    `;
+                    
+                    if (outfit.notes) {
+                        html += `<p class="outfit-notes">Notes: ${outfit.notes}</p>`;
+                    }
+                    
+                    html += '<div class="outfit-items"><h5>Items:</h5><ul>';
+                    outfit.outfit.items.forEach(item => {
+                        html += `<li>${item.name} (${item.type}, ${item.color})</li>`;
+                    });
+                    html += '</ul></div>';
+                    
+                    html += `
+                        <div class="outfit-actions">
+                            <button class="lcars-button lcars-accent-bg-2" 
+                                    onclick="recordWear(${outfit.outfit.outfit_id})">
+                                Record as Worn
+                            </button>
+                        </div>
+                    `;
+                    
+                    todayOutfitDiv.innerHTML = html;
+                } else {
+                    todayOutfitDiv.innerHTML = `
+                        <p>No outfit scheduled for today.</p>
+                        <p>Use the form on the left to schedule an outfit.</p>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading today\'s outfit:', error);
+                document.getElementById('today-outfit').innerHTML = 'Error loading today\'s outfit.';
+            });
+        
+        // Load upcoming outfits
+        fetch('/api/features/calendar/upcoming')
+            .then(response => response.json())
+            .then(data => {
+                const upcomingOutfitsDiv = document.getElementById('upcoming-outfits');
+                
+                if (data.outfits && data.outfits.length > 0) {
+                    let html = '<ul>';
+                    data.outfits.forEach(outfit => {
+                        html += `
+                            <li>
+                                <div class="upcoming-outfit">
+                                    <div class="outfit-header">
+                                        <span class="outfit-date">${outfit.date}</span>
+                                        <span class="outfit-name">${outfit.outfit.name}</span>
+                                    </div>
+                                    <div class="outfit-details">
+                                        <button class="lcars-button lcars-accent-bg-1" 
+                                                onclick="viewOutfit(${outfit.outfit.outfit_id})">
+                                            View Details
+                                        </button>
+                                        <button class="lcars-button lcars-accent-bg-3" 
+                                                onclick="deleteScheduled(${outfit.calendar_id})">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    upcomingOutfitsDiv.innerHTML = html;
+                } else {
+                    upcomingOutfitsDiv.innerHTML = 'No upcoming outfits scheduled.';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading upcoming outfits:', error);
+                document.getElementById('upcoming-outfits').innerHTML = 'Error loading upcoming outfits.';
+            });
+        
+        // Handle form submission
+        document.getElementById('schedule-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const date = document.getElementById('date-input').value;
+            const outfitId = document.getElementById('outfit-select').value;
+            const notes = document.getElementById('notes-input').value;
+            
+            if (!date || !outfitId) {
+                alert('Please select a date and an outfit.');
+                return;
+            }
+            
+            fetch('/api/features/calendar/schedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    date: date,
+                    outfit_id: parseInt(outfitId),
+                    notes: notes
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Outfit scheduled successfully!');
+                    // Reload the page to update the lists
+                    location.reload();
+                } else {
+                    alert('Failed to schedule outfit: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error scheduling outfit:', error);
+                alert('Error scheduling outfit.');
+            });
+        });
+    });
+    
+    // Function to view outfit details
+    function viewOutfit(outfitId) {
+        window.location.href = `/outfits/${outfitId}`;
+    }
+    
+    // Function to delete a scheduled outfit
+    function deleteScheduled(calendarId) {
+        if (confirm('Are you sure you want to delete this scheduled outfit?')) {
+            fetch(`/api/features/calendar/delete/${calendarId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Scheduled outfit deleted successfully!');
+                    // Reload the page to update the lists
+                    location.reload();
+                } else {
+                    alert('Failed to delete scheduled outfit: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting scheduled outfit:', error);
+                alert('Error deleting scheduled outfit.');
+            });
+        }
+    }
+    
+    // Function to record an outfit as worn
+    function recordWear(outfitId) {
+        fetch('/api/features/stats/record_wear', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                outfit_id: outfitId,
+                wear_date: new Date().toISOString().split('T')[0]
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Outfit recorded as worn!');
+                // Mark outfit items as dirty
+                fetch(`/api/features/laundry/mark_outfit_dirty/${outfitId}`, {
+                    method: 'POST'
+                })
+                .then(() => {
+                    // Reload the page
+                    location.reload();
+                });
+            } else {
+                alert('Failed to record outfit as worn: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error recording outfit as worn:', error);
+            alert('Error recording outfit as worn.');
+        });
+    }
+</script>
+{% endblock %}

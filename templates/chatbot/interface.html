@@ -1,0 +1,278 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="lcars-section">
+    <h2 class="lcars-title">OUTFIT SUGGESTIONS</h2>
+    
+    <div class="row">
+        <div class="col-md-7">
+            <div class="lcars-card" style="border-left-color: var(--lcars-orange);">
+                <div class="lcars-card-header">
+                    CONVERSATION
+                </div>
+                <div class="lcars-card-body">
+                    <div id="chat-history" style="height: 300px; overflow-y: auto; background-color: var(--lcars-navy); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div class="message assistant">
+                            <div class="message-content" style="background-color: var(--lcars-blue); color: var(--lcars-black); border-radius: 20px 20px 20px 0; padding: 10px; margin-bottom: 10px; display: inline-block; max-width: 80%;">
+                                Welcome to the Outfit Assistant! I can help you create outfit suggestions based on your clothing items. Try asking me to suggest an outfit, or specify a style or occasion like "casual outfit for summer" or "formal outfit for work".
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <input type="text" id="chat-input" class="lcars-form-control" placeholder="Ask for an outfit suggestion...">
+                        <button id="send-button" class="lcars-button lcars-button-primary">SEND</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-5">
+            <div class="lcars-card" style="border-left-color: var(--lcars-purple);">
+                <div class="lcars-card-header">
+                    SUGGESTED OUTFIT
+                </div>
+                <div class="lcars-card-body">
+                    <div id="suggestion-container" style="display: none;">
+                        <div class="mb-3">
+                            <label class="lcars-form-label">NAME</label>
+                            <input type="text" id="outfit-name" class="lcars-form-control" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="lcars-form-label">ITEMS</label>
+                            <div id="outfit-items" style="background-color: var(--lcars-navy); border-radius: 10px; padding: 10px; min-height: 100px;">
+                                <p class="text-center" style="color: var(--lcars-blue);">No outfit generated yet</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button id="save-outfit" class="lcars-button lcars-button-success">SAVE OUTFIT</button>
+                            <button id="generate-new" class="lcars-button">GENERATE NEW</button>
+                        </div>
+                    </div>
+                    
+                    <div id="no-suggestion" class="text-center p-5">
+                        <p style="color: var(--lcars-blue);">Ask the assistant to suggest an outfit</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatHistory = document.getElementById('chat-history');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+        const suggestionContainer = document.getElementById('suggestion-container');
+        const noSuggestion = document.getElementById('no-suggestion');
+        const outfitName = document.getElementById('outfit-name');
+        const outfitItems = document.getElementById('outfit-items');
+        const saveOutfitButton = document.getElementById('save-outfit');
+        const generateNewButton = document.getElementById('generate-new');
+        
+        let currentOutfit = null;
+        
+        // Function to add a message to the chat history
+        function addMessage(sender, message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.textContent = message;
+            
+            if (sender === 'user') {
+                messageContent.style.backgroundColor = 'var(--lcars-orange)';
+                messageContent.style.color = 'var(--lcars-black)';
+                messageContent.style.borderRadius = '20px 20px 0 20px';
+                messageContent.style.marginLeft = 'auto';
+            } else {
+                messageContent.style.backgroundColor = 'var(--lcars-blue)';
+                messageContent.style.color = 'var(--lcars-black)';
+                messageContent.style.borderRadius = '20px 20px 20px 0';
+            }
+            
+            messageContent.style.padding = '10px';
+            messageContent.style.marginBottom = '10px';
+            messageContent.style.display = 'inline-block';
+            messageContent.style.maxWidth = '80%';
+            
+            messageDiv.appendChild(messageContent);
+            chatHistory.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+        
+        // Function to send a message to the chatbot
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage('user', message);
+            
+            // Clear input
+            chatInput.value = '';
+            
+            // Send to server
+            fetch('/chatbot/suggest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `message=${encodeURIComponent(message)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Add assistant response to chat
+                addMessage('assistant', data.message);
+                
+                if (data.success) {
+                    // Show suggestion
+                    suggestionContainer.style.display = 'block';
+                    noSuggestion.style.display = 'none';
+                    
+                    // Update outfit details
+                    outfitName.value = data.outfit.name;
+                    
+                    // Clear previous items
+                    outfitItems.innerHTML = '';
+                    
+                    // Add items
+                    data.outfit.items.forEach(item => {
+                        const itemElement = document.createElement('p');
+                        itemElement.textContent = `• ${item.name} (${item.type}, ${item.color})`;
+                        outfitItems.appendChild(itemElement);
+                    });
+                    
+                    // Store current outfit
+                    currentOutfit = data.outfit;
+                } else {
+                    // Hide suggestion if error
+                    suggestionContainer.style.display = 'none';
+                    noSuggestion.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage('assistant', 'Sorry, there was an error processing your request.');
+            });
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        saveOutfitButton.addEventListener('click', function() {
+            if (!currentOutfit) return;
+            
+            fetch('/chatbot/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(currentOutfit)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addMessage('assistant', data.message);
+                    
+                    // Add link to view the outfit
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message assistant';
+                    
+                    const messageContent = document.createElement('div');
+                    messageContent.className = 'message-content';
+                    messageContent.style.backgroundColor = 'var(--lcars-blue)';
+                    messageContent.style.color = 'var(--lcars-black)';
+                    messageContent.style.borderRadius = '20px 20px 20px 0';
+                    messageContent.style.padding = '10px';
+                    messageContent.style.marginBottom = '10px';
+                    messageContent.style.display = 'inline-block';
+                    messageContent.style.maxWidth = '80%';
+                    
+                    const link = document.createElement('a');
+                    link.href = `/outfits/${data.outfit_id}`;
+                    link.textContent = 'View Saved Outfit';
+                    link.className = 'lcars-button lcars-button-primary';
+                    link.style.display = 'inline-block';
+                    link.style.marginTop = '10px';
+                    
+                    messageContent.appendChild(document.createTextNode('You can view the saved outfit here: '));
+                    messageContent.appendChild(document.createElement('br'));
+                    messageContent.appendChild(link);
+                    
+                    messageDiv.appendChild(messageContent);
+                    chatHistory.appendChild(messageDiv);
+                    
+                    // Scroll to bottom
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                } else {
+                    addMessage('assistant', 'Sorry, there was an error saving the outfit: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage('assistant', 'Sorry, there was an error saving the outfit.');
+            });
+        });
+        
+        generateNewButton.addEventListener('click', function() {
+            // Show loading state
+            addMessage('assistant', 'Generating a new outfit suggestion...');
+            
+            // Call the generate_new endpoint
+            fetch('/chatbot/generate_new', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Add assistant response to chat
+                addMessage('assistant', data.message);
+                
+                if (data.success) {
+                    // Show suggestion
+                    suggestionContainer.style.display = 'block';
+                    noSuggestion.style.display = 'none';
+                    
+                    // Update outfit details
+                    outfitName.value = data.outfit.name;
+                    
+                    // Clear previous items
+                    outfitItems.innerHTML = '';
+                    
+                    // Add items
+                    data.outfit.items.forEach(item => {
+                        const itemElement = document.createElement('p');
+                        itemElement.textContent = `• ${item.name} (${item.type}, ${item.color})`;
+                        outfitItems.appendChild(itemElement);
+                    });
+                    
+                    // Store current outfit
+                    currentOutfit = data.outfit;
+                } else {
+                    // Hide suggestion if error
+                    suggestionContainer.style.display = 'none';
+                    noSuggestion.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage('assistant', 'Sorry, there was an error generating a new outfit.');
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="lcars-section">
+    <h2 class="lcars-title">{% if outfit %}EDIT{% else %}CREATE NEW{% endif %} OUTFIT</h2>
+
+    <div class="lcars-card">
+        <div class="lcars-card-body">
+            <form action="{{ url_for('save_outfit') }}" method="post" enctype="multipart/form-data">
+                {% if outfit %}
+                <input type="hidden" name="outfit_id" value="{{ outfit.outfit_id }}">
+                {% endif %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="name" class="lcars-form-label">NAME *</label>
+                            <input type="text" class="lcars-form-control" id="name" name="name" value="{{ outfit.name if outfit else '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="lcars-form-label">DESCRIPTION</label>
+                            <textarea class="lcars-form-control" id="description" name="description" rows="3">{{ outfit.description if outfit else '' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="lcars-form-label">RATING</label>
+                            <div class="d-flex">
+                                {% for i in range(1, 6) %}
+                                <div class="form-check me-3">
+                                    <input class="form-check-input" type="radio" name="rating" id="rating{{ i }}" value="{{ i }}" 
+                                           {% if outfit and outfit.rating == i %}checked{% endif %}>
+                                    <label class="form-check-label" for="rating{{ i }}">{{ i }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="photo" class="lcars-form-label">PHOTO</label>
+                            <input type="file" class="lcars-form-control" id="photo" name="photo" accept="image/*">
+                            {% if outfit and outfit.photo_path %}
+                            <div class="mt-2">
+                                <img src="{{ url_for('get_photo', filename=outfit.photo_path.replace(config['UPLOAD_FOLDER'] + '/', '')) }}" 
+                                     alt="{{ outfit.name }}" class="img-thumbnail" 
+                                     style="max-height: 150px; border: 2px solid var(--lcars-purple);">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="lcars-form-label">CLOTHING ITEMS</label>
+                            <div style="max-height: 200px; overflow-y: auto; background-color: var(--lcars-navy); border-radius: 10px; padding: 10px;">
+                                {% for item in items %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="item_ids" id="item{{ item.item_id }}" value="{{ item.item_id }}"
+                                           {% if outfit and item.item_id in outfit.items|map(attribute='item_id')|list %}checked{% endif %}>
+                                    <label class="form-check-label" for="item{{ item.item_id }}">
+                                        {{ item.name }} ({{ item.type }}, {{ item.color }})
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="lcars-form-label">TAGS</label>
+                            <div style="max-height: 200px; overflow-y: auto; background-color: var(--lcars-navy); border-radius: 10px; padding: 10px;">
+                                {% for category in tag_categories %}
+                                <h6 style="color: var(--lcars-orange); margin-top: 10px;">{{ category.name }}</h6>
+                                {% for tag in tags if tag.category_id == category.category_id %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tag_ids" id="tag{{ tag.tag_id }}" value="{{ tag.tag_id }}"
+                                           {% if outfit and tag.tag_id in outfit.tags|map(attribute='tag_id')|list %}checked{% endif %}>
+                                    <label class="form-check-label" for="tag{{ tag.tag_id }}">
+                                        {{ tag.name }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="lcars-button lcars-button-primary">SAVE</button>
+                    <a href="{{ url_for('outfits_list') }}" class="lcars-button">CANCEL</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

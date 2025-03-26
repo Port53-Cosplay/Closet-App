@@ -1,0 +1,24 @@
+# Don't include your database file
+*.db
+*.zip
+
+# Don't include cached Python bytecode
+__pycache__/
+*.pyc
+
+# Don't include local Python environment packages
+*.egg-info/
+*.egg
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ENV/
+build/
+dist/
+*.zip
+
+# Don't include OS or editor clutter
+.DS_Store
+*.swp

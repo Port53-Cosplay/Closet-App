@@ -1,0 +1,65 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="lcars-section">
+    <h2 class="lcars-title">SEARCH RESULTS</h2>
+
+    <div class="mb-3">
+        <a href="{{ url_for('search_form') }}" class="lcars-button">NEW SEARCH</a>
+    </div>
+
+    <div class="row">
+        {% if outfits %}
+            {% for outfit in outfits %}
+            <div class="col-md-4 mb-4">
+                <div class="lcars-card" style="border-left-color: var(--lcars-purple);">
+                    <div class="lcars-card-header">
+                        {{ outfit.name }}
+                    </div>
+                    <div class="lcars-card-body">
+                        {% if outfit.photo_path %}
+                        <img src="{{ url_for('get_photo', filename=outfit.photo_path.replace(config['UPLOAD_FOLDER'] + '/', '')) }}" 
+                             class="img-fluid mb-2" alt="{{ outfit.name }}" 
+                             style="height: 180px; width: 100%; object-fit: cover; border-radius: 10px; border: 2px solid var(--lcars-purple);">
+                        {% else %}
+                        <div class="text-center p-4 mb-2" style="background-color: var(--lcars-navy); border-radius: 10px; border: 2px solid var(--lcars-purple);">
+                            <p style="color: var(--lcars-blue);">NO PHOTO</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-2">
+                            <strong>Items:</strong>
+                            <ul style="list-style-type: none; padding-left: 0;">
+                                {% for item in outfit.items %}
+                                <li>• {{ item.name }} ({{ item.type }})</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        {% if outfit.tags %}
+                        <div class="mb-2">
+                            <strong>Tags:</strong> 
+                            {% for tag in outfit.tags %}
+                            <span class="badge" style="background-color: var(--lcars-blue); color: var(--lcars-black);">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <a href="{{ url_for('view_outfit', outfit_id=outfit.outfit_id) }}" class="lcars-button lcars-button-primary">VIEW OUTFIT</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="lcars-alert">
+                    <p>No outfits found matching your search criteria.</p>
+                    <a href="{{ url_for('search_form') }}" class="lcars-button">TRY ANOTHER SEARCH</a>
+                    <a href="{{ url_for('new_outfit') }}" class="lcars-button lcars-button-success">CREATE NEW OUTFIT</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

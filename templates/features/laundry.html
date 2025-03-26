@@ -1,0 +1,152 @@
+{% extends "index.html" %}
+
+{% block title %}Laundry Tracker{% endblock %}
+
+{% block content %}
+<div class="lcars-row">
+    <div class="lcars-column lcars-u-3">
+        <div class="lcars-element lcars-primary-bg">
+            <h2>Laundry Tracker</h2>
+        </div>
+        <div class="lcars-element lcars-secondary-bg">
+            <div class="lcars-stats">
+                <div id="laundry-stats">Loading statistics...</div>
+            </div>
+        </div>
+    </div>
+    <div class="lcars-column lcars-u-9">
+        <div class="lcars-element lcars-accent-bg-1">
+            <h3>Clean Items</h3>
+        </div>
+        <div class="lcars-element lcars-bg-1">
+            <div id="clean-items-list" class="lcars-list">Loading clean items...</div>
+        </div>
+        <div class="lcars-element lcars-accent-bg-2">
+            <h3>Dirty Items</h3>
+        </div>
+        <div class="lcars-element lcars-bg-2">
+            <div id="dirty-items-list" class="lcars-list">Loading dirty items...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load laundry statistics
+        fetch('/api/features/laundry/stats')
+            .then(response => response.json())
+            .then(data => {
+                const statsDiv = document.getElementById('laundry-stats');
+                statsDiv.innerHTML = `
+                    <p>Clean Items: ${data.clean_count} (${data.clean_percentage}%)</p>
+                    <p>Dirty Items: ${data.dirty_count} (${data.dirty_percentage}%)</p>
+                    <p>Total Items: ${data.total_count}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error fetching laundry stats:', error);
+                document.getElementById('laundry-stats').innerHTML = 'Error loading statistics.';
+            });
+        
+        // Load clean items
+        fetch('/api/features/laundry/clean_items')
+            .then(response => response.json())
+            .then(data => {
+                const cleanItemsList = document.getElementById('clean-items-list');
+                if (data.items && data.items.length > 0) {
+                    let html = '<ul>';
+                    data.items.forEach(item => {
+                        html += `
+                            <li>
+                                <span>${item.name} (${item.type}, ${item.color})</span>
+                                <button class="lcars-button lcars-accent-bg-2" 
+                                        onclick="markAsDirty(${item.item_id})">
+                                    Mark as Dirty
+                                </button>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    cleanItemsList.innerHTML = html;
+                } else {
+                    cleanItemsList.innerHTML = 'No clean items found.';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching clean items:', error);
+                document.getElementById('clean-items-list').innerHTML = 'Error loading clean items.';
+            });
+        
+        // Load dirty items
+        fetch('/api/features/laundry/dirty_items')
+            .then(response => response.json())
+            .then(data => {
+                const dirtyItemsList = document.getElementById('dirty-items-list');
+                if (data.items && data.items.length > 0) {
+                    let html = '<ul>';
+                    data.items.forEach(item => {
+                        html += `
+                            <li>
+                                <span>${item.name} (${item.type}, ${item.color})</span>
+                                <button class="lcars-button lcars-accent-bg-1" 
+                                        onclick="markAsClean(${item.item_id})">
+                                    Mark as Clean
+                                </button>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    dirtyItemsList.innerHTML = html;
+                } else {
+                    dirtyItemsList.innerHTML = 'No dirty items found.';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching dirty items:', error);
+                document.getElementById('dirty-items-list').innerHTML = 'Error loading dirty items.';
+            });
+    });
+    
+    // Function to mark an item as dirty
+    function markAsDirty(itemId) {
+        fetch(`/api/features/laundry/mark_dirty/${itemId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to update the lists
+                location.reload();
+            } else {
+                alert('Failed to mark item as dirty.');
+            }
+        })
+        .catch(error => {
+            console.error('Error marking item as dirty:', error);
+            alert('Error marking item as dirty.');
+        });
+    }
+    
+    // Function to mark an item as clean
+    function markAsClean(itemId) {
+        fetch(`/api/features/laundry/mark_clean/${itemId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to update the lists
+                location.reload();
+            } else {
+                alert('Failed to mark item as clean.');
+            }
+        })
+        .catch(error => {
+            console.error('Error marking item as clean:', error);
+            alert('Error marking item as clean.');
+        });
+    }
+</script>
+{% endblock %}

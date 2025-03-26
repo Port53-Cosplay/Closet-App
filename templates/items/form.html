@@ -1,0 +1,97 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="lcars-section">
+    <h2 class="lcars-title">{% if item %}EDIT{% else %}ADD NEW{% endif %} CLOTHING ITEM</h2>
+
+    <div class="lcars-card">
+        <div class="lcars-card-body">
+            <form action="{{ url_for('save_item') }}" method="post" enctype="multipart/form-data">
+                {% if item %}
+                <input type="hidden" name="item_id" value="{{ item.item_id }}">
+                {% endif %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="name" class="lcars-form-label">NAME *</label>
+                            <input type="text" class="lcars-form-control" id="name" name="name" value="{{ item.name if item else '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="type" class="lcars-form-label">TYPE *</label>
+                            <select class="lcars-form-control" id="item_type" name="item_type" required>
+                                <option value="" disabled {% if not item %}selected{% endif %}>Select a type</option>
+                                <option value="Shirt" {% if item and item.type == 'Shirt' %}selected{% endif %}>Shirt</option>
+                                <option value="Pants" {% if item and item.type == 'Pants' %}selected{% endif %}>Pants</option>
+                                <option value="Shoes" {% if item and item.type == 'Shoes' %}selected{% endif %}>Shoes</option>
+                                <option value="Dress" {% if item and item.type == 'Dress' %}selected{% endif %}>Dress</option>
+                                <option value="Jacket" {% if item and item.type == 'Jacket' %}selected{% endif %}>Jacket</option>
+                                <option value="Accessory" {% if item and item.type == 'Accessory' %}selected{% endif %}>Accessory</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="color" class="lcars-form-label">COLOR *</label>
+                            <input type="text" class="lcars-form-control" id="color" name="color" value="{{ item.color if item else '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="brand" class="lcars-form-label">BRAND</label>
+                            <input type="text" class="lcars-form-control" id="brand" name="brand" value="{{ item.brand if item else '' }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="size" class="lcars-form-label">SIZE</label>
+                            <input type="text" class="lcars-form-control" id="size" name="size" value="{{ item.size if item else '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="material" class="lcars-form-label">MATERIAL</label>
+                            <input type="text" class="lcars-form-control" id="material" name="material" value="{{ item.material if item else '' }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="season" class="lcars-form-label">SEASON</label>
+                            <select class="lcars-form-control" id="season" name="season">
+                                <option value="" {% if not item or not item.season %}selected{% endif %}>Select a season</option>
+                                <option value="Summer" {% if item and item.season == 'Summer' %}selected{% endif %}>Summer</option>
+                                <option value="Winter" {% if item and item.season == 'Winter' %}selected{% endif %}>Winter</option>
+                                <option value="Fall" {% if item and item.season == 'Fall' %}selected{% endif %}>Fall</option>
+                                <option value="Spring" {% if item and item.season == 'Spring' %}selected{% endif %}>Spring</option>
+                                <option value="All-Season" {% if item and item.season == 'All-Season' %}selected{% endif %}>All-Season</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="occasion" class="lcars-form-label">OCCASION</label>
+                            <input type="text" class="lcars-form-control" id="occasion" name="occasion" value="{{ item.occasion if item else '' }}" placeholder="e.g., Casual, Work, Formal (comma-separated)">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="lcars-form-label">NOTES</label>
+                            <textarea class="lcars-form-control" id="notes" name="notes" rows="3">{{ item.notes if item else '' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="photo" class="lcars-form-label">PHOTO</label>
+                            <input type="file" class="lcars-form-control" id="photo" name="photo" accept="image/*">
+                            {% if item and item.photo_path %}
+                            <div class="mt-2">
+                                <img src="{{ url_for('get_photo', filename=item.photo_path.replace(config['UPLOAD_FOLDER'] + '/', '')) }}" alt="{{ item.name }}" class="img-thumbnail" style="max-height: 150px;">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="lcars-button lcars-button-primary">SAVE</button>
+                    <a href="{{ url_for('items_list') }}" class="lcars-button">CANCEL</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

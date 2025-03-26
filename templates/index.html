@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeAnna's Clothing Database System - Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lcars-orange: #ff9900;
+            --lcars-pink: #cc6699;
+            --lcars-purple: #cc99cc;
+            --lcars-blue: #9999ff;
+            --lcars-navy: #000033;
+            --lcars-black: #000000;
+            --lcars-bg: #111122;
+            --lcars-text: #f7f7f7;
+        }
+        
+        body {
+            background-color: var(--lcars-bg);
+            color: var(--lcars-text);
+            font-family: 'Antonio', sans-serif;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        
+        /* LCARS Header */
+        .lcars-header {
+            display: flex;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .lcars-header-left {
+            width: 200px;
+            height: 100%;
+            background-color: var(--lcars-orange);
+            border-top-right-radius: 40px;
+            border-bottom-right-radius: 40px;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--lcars-black);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .lcars-header-right {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .lcars-header-block {
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 20px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--lcars-black);
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .lcars-header-block:hover {
+            opacity: 0.9;
+        }
+        
+        .lcars-orange {
+            background-color: var(--lcars-orange);
+        }
+        
+        .lcars-pink {
+            background-color: var(--lcars-pink);
+        }
+        
+        .lcars-purple {
+            background-color: var(--lcars-purple);
+        }
+        
+        .lcars-blue {
+            background-color: var(--lcars-blue);
+        }
+        
+        /* LCARS Content */
+        .lcars-container {
+            padding: 0 20px;
+        }
+        
+        .lcars-section {
+            background-color: rgba(0, 0, 51, 0.7);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 15px solid var(--lcars-orange);
+        }
+        
+        .lcars-title {
+            color: var(--lcars-orange);
+            margin-bottom: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid var(--lcars-orange);
+            padding-bottom: 10px;
+        }
+        
+        /* LCARS Cards */
+        .lcars-card {
+            background-color: rgba(0, 0, 51, 0.5);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border-left: 10px solid var(--lcars-pink);
+        }
+        
+        .lcars-card-header {
+            background-color: var(--lcars-navy);
+            padding: 10px 20px;
+            color: var(--lcars-orange);
+            font-weight: bold;
+            border-bottom: 2px solid var(--lcars-pink);
+        }
+        
+        .lcars-card-body {
+            padding: 20px;
+        }
+        
+        /* LCARS Buttons */
+        .lcars-button {
+            background-color: var(--lcars-orange);
+            color: var(--lcars-black);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        .lcars-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .lcars-button-primary {
+            background-color: var(--lcars-blue);
+        }
+        
+        .lcars-button-success {
+            background-color: var(--lcars-purple);
+        }
+        
+        .lcars-button-danger {
+            background-color: #ff3366;
+        }
+        
+        /* LCARS Forms */
+        .lcars-form-control {
+            background-color: rgba(0, 0, 51, 0.3);
+            border: 2px solid var(--lcars-blue);
+            border-radius: 20px;
+            color: var(--lcars-text);
+            padding: 8px 15px;
+        }
+        
+        .lcars-form-control:focus {
+            background-color: rgba(0, 0, 51, 0.5);
+            border-color: var(--lcars-orange);
+            box-shadow: 0 0 0 0.25rem rgba(255, 153, 0, 0.25);
+            color: var(--lcars-text);
+        }
+        
+        .lcars-form-label {
+            color: var(--lcars-orange);
+            font-weight: bold;
+        }
+        
+        /* LCARS Tables */
+        .lcars-table {
+            width: 100%;
+            color: var(--lcars-text);
+            border-collapse: separate;
+            border-spacing: 0 5px;
+        }
+        
+        .lcars-table th {
+            background-color: var(--lcars-navy);
+            color: var(--lcars-orange);
+            padding: 10px;
+            text-transform: uppercase;
+        }
+        
+        .lcars-table td {
+            background-color: rgba(0, 0, 51, 0.3);
+            padding: 10px;
+        }
+        
+        .lcars-table tr:hover td {
+            background-color: rgba(0, 0, 51, 0.5);
+        }
+        
+        /* LCARS Alerts */
+        .lcars-alert {
+            background-color: var(--lcars-navy);
+            border-left: 10px solid var(--lcars-orange);
+            color: var(--lcars-text);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 20px 20px 0;
+        }
+        
+        .lcars-alert-success {
+            border-left-color: var(--lcars-purple);
+        }
+        
+        .lcars-alert-danger {
+            border-left-color: #ff3366;
+        }
+        
+        /* Bootstrap Overrides */
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        
+        .modal-content {
+            background-color: var(--lcars-navy);
+            color: var(--lcars-text);
+            border-radius: 20px;
+            border-left: 15px solid var(--lcars-orange);
+        }
+        
+        .modal-header {
+            border-bottom-color: var(--lcars-orange);
+        }
+        
+        .modal-footer {
+            border-top-color: var(--lcars-orange);
+        }
+    </style>
+</head>
+<body>
+    <div class="lcars-header">
+        <div class="lcars-header-left">DeAnna's Closet</div>
+        <div class="lcars-header-right">
+            <a href="/" class="lcars-header-block lcars-orange">HOME</a>
+            <a href="/items" class="lcars-header-block lcars-pink">ITEMS</a>
+            <a href="/outfits" class="lcars-header-block lcars-purple">OUTFITS</a>
+            <a href="/search" class="lcars-header-block lcars-blue">SEARCH</a>
+            <a href="/chatbot" class="lcars-header-block lcars-orange">SUGGESTIONS</a>
+        </div>
+    </div>
+
+    <div class="lcars-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="lcars-alert lcars-alert-{{ category if category != 'error' else 'danger' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="content">
+            {% block content %}
+            <div class="lcars-section">
+                <h1 class="lcars-title">WELCOME TO YOUR CLOTHING DATABASE</h1>
+                <p>Manage your clothing items, create outfits, and get outfit suggestions.</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="lcars-card">
+                            <div class="lcars-card-header">
+                                CLOTHING ITEMS
+                            </div>
+                            <div class="lcars-card-body">
+                                <p>Manage your individual clothing items with details like type, color, and season.</p>
+                                <a href="/items" class="lcars-button lcars-button-primary">VIEW ITEMS</a>
+                                <a href="/items/new" class="lcars-button lcars-button-success">ADD NEW ITEM</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="lcars-card">
+                            <div class="lcars-card-header">
+                                OUTFITS
+                            </div>
+                            <div class="lcars-card-body">
+                                <p>Create and manage outfits by combining your clothing items.</p>
+                                <a href="/outfits" class="lcars-button lcars-button-primary">VIEW OUTFITS</a>
+                                <a href="/outfits/new" class="lcars-button lcars-button-success">CREATE NEW OUTFIT</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="lcars-card">
+                            <div class="lcars-card-header">
+                                SEARCH
+                            </div>
+                            <div class="lcars-card-body">
+                                <p>Find outfits by clothing item, name, or tags.</p>
+                                <a href="/search" class="lcars-button lcars-button-primary">SEARCH OUTFITS</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="lcars-card">
+                            <div class="lcars-card-header">
+                                OUTFIT SUGGESTIONS
+                            </div>
+                            <div class="lcars-card-body">
+                                <p>Get outfit suggestions based on your clothing items.</p>
+                                <a href="/chatbot" class="lcars-button lcars-button-primary">GET SUGGESTIONS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
