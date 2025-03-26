@@ -441,7 +441,9 @@ def get_photo(filename):
 
 # ----- Main -----
 
-# Initialize all additional features
+from feature_routes import create_feature_routes  # Adjust import path as needed
+
+# After initializing your app and database
 create_feature_routes(app, db)
 
 if __name__ == '__main__':
