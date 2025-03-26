@@ -1,0 +1,72 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="lcars-section">
+    <h2 class="lcars-title">SEARCH OUTFITS</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="lcars-card" style="border-left-color: var(--lcars-orange);">
+                <div class="lcars-card-header">
+                    SEARCH BY ITEM
+                </div>
+                <div class="lcars-card-body">
+                    <form action="{{ url_for('search_results') }}" method="get">
+                        <input type="hidden" name="search_type" value="item">
+                        <div class="mb-3">
+                            <label for="item_id" class="lcars-form-label">SELECT ITEM</label>
+                            <select class="lcars-form-control" id="item_id" name="item_id" required>
+                                <option value="" disabled selected>Select an item</option>
+                                {% for item in items %}
+                                <option value="{{ item.item_id }}">{{ item.name }} ({{ item.type }}, {{ item.color }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="lcars-button lcars-button-primary">SEARCH</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="lcars-card" style="border-left-color: var(--lcars-pink);">
+                <div class="lcars-card-header">
+                    SEARCH BY NAME
+                </div>
+                <div class="lcars-card-body">
+                    <form action="{{ url_for('search_results') }}" method="get">
+                        <input type="hidden" name="search_type" value="name">
+                        <div class="mb-3">
+                            <label for="query" class="lcars-form-label">OUTFIT NAME</label>
+                            <input type="text" class="lcars-form-control" id="query" name="query" required>
+                        </div>
+                        <button type="submit" class="lcars-button lcars-button-primary">SEARCH</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="lcars-card" style="border-left-color: var(--lcars-purple);">
+                <div class="lcars-card-header">
+                    SEARCH BY TAG
+                </div>
+                <div class="lcars-card-body">
+                    <form action="{{ url_for('search_results') }}" method="get">
+                        <input type="hidden" name="search_type" value="tag">
+                        <div class="mb-3">
+                            <label for="tag_id" class="lcars-form-label">SELECT TAG</label>
+                            <select class="lcars-form-control" id="tag_id" name="tag_id" required>
+                                <option value="" disabled selected>Select a tag</option>
+                                {% for tag in tags %}
+                                <option value="{{ tag.tag_id }}">{{ tag.name }} ({{ tag.category_name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="lcars-button lcars-button-primary">SEARCH</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
