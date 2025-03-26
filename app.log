@@ -1,0 +1,39 @@
+nohup: ignoring input
+ * Serving Flask app 'app' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+ * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+ * Running on http://192.168.14.47:5000/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-252-006
+192.168.14.144 - - [26/Mar/2025 14:55:02] "GET / HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 14:55:06] "GET /items HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 14:55:08] "GET /items/2 HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 14:55:13] "GET /laundry HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:29:44] "GET /items HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:29:50] "GET /items/7 HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:29:53] "GET /items/7/edit HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:29:58] "GET /items/7/edit HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:30:02] "GET / HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:34:12] "GET /items HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:34:18] "GET /items/7 HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:34:21] "GET /items/7/edit HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:34:25] "POST /items/save HTTP/1.1" 302 -
+192.168.14.144 - - [26/Mar/2025 17:34:25] "GET /items HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:34:30] "GET /items/8/edit HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:34:34] "POST /items/save HTTP/1.1" 302 -
+192.168.14.144 - - [26/Mar/2025 17:34:34] "GET /items HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:35:44] "GET /items/12/edit HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:36:14] "POST /items/save HTTP/1.1" 302 -
+192.168.14.144 - - [26/Mar/2025 17:36:14] "GET /items HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:36:20] "GET /items/12 HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:37:55] "GET /items HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:37:56] "GET /items/new HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:38:26] "POST /items/save HTTP/1.1" 302 -
+192.168.14.144 - - [26/Mar/2025 17:38:26] "GET /items/16 HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:38:31] "GET /items HTTP/1.1" 200 -
+192.168.14.144 - - [26/Mar/2025 17:38:51] "GET / HTTP/1.1" 200 -
